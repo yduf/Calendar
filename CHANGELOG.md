@@ -7,7 +7,7 @@ propose a default keybinding
 Publish officially
 - [x] - add a license file
 - [ ] - published source on github
-- [ ] - clean up extension icon
+- [x] - clean up extension icon
 - [ ] - review README.md file
 - [ ] - buy me a coffee?
 
