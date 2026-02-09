@@ -139,6 +139,14 @@ window.addEventListener('message', event => {
         case 'updatePreview':
             preview.textContent = `Preview: ${message.value}`;
             break;
+        case 'setSelectedDate':
+            if (message.value) {
+                selectedDate = new Date(message.value);
+                currentViewDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+                renderCalendar();
+                updatePreview();
+            }
+            break;
     }
 });
 
@@ -146,3 +154,6 @@ window.addEventListener('message', event => {
 renderCalendar();
 updatePreview();
 document.getElementById('calendar-widget').focus();
+
+// Signal that the webview is ready
+vscode.postMessage({ type: 'ready' });

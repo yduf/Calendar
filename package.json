@@ -20,6 +20,28 @@
           "type": "string",
           "default": "default",
           "description": "The format to use for the inserted date. Use 'default' for system locale format, or 'ISO' for YYYY-MM-DD."
+        },
+        "calendar.enabledLanguages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "markdown",
+            "plaintext",
+            "javascript",
+            "typescript"
+          ],
+          "description": "Languages where date recognition is enabled."
+        },
+        "calendar.ambiguityResolution": {
+          "type": "string",
+          "enum": [
+            "DMY",
+            "MDY"
+          ],
+          "default": "DMY",
+          "description": "How to resolve ambiguous dates like 01/02/2023 (Day-Month-Year vs Month-Day-Year)."
         }
       }
     },
@@ -27,6 +49,10 @@
       {
         "command": "calendar.insertDate",
         "title": "Insert Date from Calendar"
+      },
+      {
+        "command": "calendar.editDate",
+        "title": "Edit Date"
       }
     ]
   },
