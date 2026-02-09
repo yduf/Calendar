@@ -106,6 +106,8 @@ insertBtn.onclick = sendDate;
 window.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
         sendDate();
+    } else if (event.key === 'Escape') {
+        vscode.postMessage({ type: 'close' });
     } else if (event.key === 'ArrowLeft') {
         event.preventDefault();
         selectedDate.setDate(selectedDate.getDate() - 1);

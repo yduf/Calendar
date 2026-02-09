@@ -30,6 +30,9 @@ export function activate(context: vscode.ExtensionContext) {
             insertDateAtCursor(editor, message.value);
             panel.dispose();
             return;
+          case 'close':
+            panel.dispose();
+            return;
           case 'requestPreview':
             panel.webview.postMessage({
               type: 'updatePreview',
