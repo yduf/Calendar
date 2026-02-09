@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 export function activate(context: vscode.ExtensionContext) {
   const disposable = vscode.commands.registerCommand(
     'calendar.insertDate',
-    () => {
+    async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
         vscode.window.showErrorMessage('No active text editor found');
@@ -22,7 +22,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
       );
 
-      panel.webview.html = getWebviewHtml(panel.webview, context);
+      panel.webview.html = await getWebviewHtml(panel.webview, context);
 
       panel.webview.onDidReceiveMessage(message => {
         switch (message.type) {
@@ -82,37 +82,34 @@ function insertDateAtCursor(editor: vscode.TextEditor, dateString: string) {
   });
 }
 
-function getWebviewHtml(
+async function getWebviewHtml(
   webview: vscode.Webview,
   context: vscode.ExtensionContext
-): string {
+): Promise<string> {
   const scriptUri = webview.asWebviewUri(
     vscode.Uri.joinPath(context.extensionUri, 'media', 'calendar.js')
   );
   const styleUri = webview.asWebviewUri(
     vscode.Uri.joinPath(context.extensionUri, 'media', 'calendar.css')
   );
+  const htmlUri = vscode.Uri.joinPath(
+    context.extensionUri,
+    'media',
+    'calendar.html'
+  );
 
   const nonce = getNonce();
 
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
-  <title>Select Date</title>
-  <link rel="stylesheet" href="${styleUri}" />
-</head>
-<body>
-  <div class="container">
-    <input type="date" id="calendar" />
-    <div id="preview" class="preview"></div>
-    <button id="insertBtn">Insert Date</button>
-  </div>
-  <script nonce="${nonce}" src="${scriptUri}"></script>
-</body>
-</html>`;
+  const htmlData = await vscode.workspace.fs.readFile(htmlUri);
+  let html = new TextDecoder().decode(htmlData);
+
+  html = html
+    .replace(/{{cspSource}}/g, webview.cspSource)
+    .replace(/{{nonce}}/g, nonce)
+    .replace(/{{styleUri}}/g, styleUri.toString())
+    .replace(/{{scriptUri}}/g, scriptUri.toString());
+
+  return html;
 }
 
 function getNonce() {
