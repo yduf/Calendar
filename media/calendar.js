@@ -1,57 +1,135 @@
 const vscode = acquireVsCodeApi();
 
-// Set default date to today
-const dateInput = document.getElementById('calendar');
-const preview = document.getElementById('preview');
-const today = new Date().toISOString().split('T')[0];
-dateInput.value = today;
-dateInput.focus();
+let selectedDate = new Date();
+let currentViewDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
 
-// Attempt to open the calendar picker automatically
-// Using a small timeout to ensure the element is ready and focused
-setTimeout(() => {
-    try {
-        if (dateInput.showPicker) {
-            dateInput.showPicker();
-        }
-    } catch (e) {
-        console.log('showPicker not supported or failed', e);
+const monthDisplay = document.getElementById('monthDisplay');
+const calendarGrid = document.getElementById('calendar-grid');
+const prevMonthBtn = document.getElementById('prevMonth');
+const nextMonthBtn = document.getElementById('nextMonth');
+const preview = document.getElementById('preview');
+const insertBtn = document.getElementById('insertBtn');
+
+function renderCalendar() {
+    calendarGrid.innerHTML = '';
+    
+    const year = currentViewDate.getFullYear();
+    const month = currentViewDate.getMonth();
+    
+    // Set month display
+    const monthName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentViewDate);
+    monthDisplay.textContent = `${monthName} ${year}`;
+    
+    // First day of month
+    const firstDayOfMonth = new Date(year, month, 1).getDay();
+    // Last day of month
+    const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+    // Last day of previous month
+    const lastDayOfPrevMonth = new Date(year, month, 0).getDate();
+    
+    // Previous month days
+    for (let i = firstDayOfMonth; i > 0; i--) {
+        const day = lastDayOfPrevMonth - i + 1;
+        createDayElement(day, 'other-month', new Date(year, month - 1, day));
     }
-}, 100);
+    
+    // Current month days
+    const today = new Date();
+    for (let i = 1; i <= lastDayOfMonth; i++) {
+        let className = '';
+        const date = new Date(year, month, i);
+        if (date.toDateString() === today.toDateString()) {
+            className += ' today';
+        }
+        if (date.toDateString() === selectedDate.toDateString()) {
+            className += ' selected';
+        }
+        createDayElement(i, className, date);
+    }
+    
+    // Next month days to fill the grid (up to 42 cells for 6 rows)
+    const totalCells = 42;
+    const remainingCells = totalCells - calendarGrid.children.length;
+    for (let i = 1; i <= remainingCells; i++) {
+        createDayElement(i, 'other-month', new Date(year, month + 1, i));
+    }
+}
+
+function createDayElement(day, className, date) {
+    const div = document.createElement('div');
+    div.textContent = day;
+    div.className = 'calendar-day ' + className;
+    div.onclick = () => {
+        selectedDate = date;
+        currentViewDate = new Date(date.getFullYear(), date.getMonth(), 1);
+        renderCalendar();
+        updatePreview();
+    };
+    calendarGrid.appendChild(div);
+}
+
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
 
 function updatePreview() {
-    const date = dateInput.value;
-    if (date) {
-        vscode.postMessage({
-            type: 'requestPreview',
-            value: date
-        });
-    }
+    const dateStr = formatDate(selectedDate);
+    vscode.postMessage({
+        type: 'requestPreview',
+        value: dateStr
+    });
 }
 
 function sendDate() {
-    const date = dateInput.value;
-    if (date) {
-        vscode.postMessage({
-            type: 'dateSelected',
-            value: date
-        });
-    }
+    const dateStr = formatDate(selectedDate);
+    vscode.postMessage({
+        type: 'dateSelected',
+        value: dateStr
+    });
 }
 
-// Initial preview
-updatePreview();
+prevMonthBtn.onclick = () => {
+    currentViewDate.setMonth(currentViewDate.getMonth() - 1);
+    renderCalendar();
+};
 
-dateInput.addEventListener('change', updatePreview);
-dateInput.addEventListener('input', updatePreview);
+nextMonthBtn.onclick = () => {
+    currentViewDate.setMonth(currentViewDate.getMonth() + 1);
+    renderCalendar();
+};
 
-document.getElementById('insertBtn').addEventListener('click', sendDate);
+insertBtn.onclick = sendDate;
 
-dateInput.addEventListener('keydown', (event) => {
+window.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
         sendDate();
+    } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        selectedDate.setDate(selectedDate.getDate() - 1);
+        updateDateAndRender();
+    } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        selectedDate.setDate(selectedDate.getDate() + 1);
+        updateDateAndRender();
+    } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        selectedDate.setDate(selectedDate.getDate() - 7);
+        updateDateAndRender();
+    } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        selectedDate.setDate(selectedDate.getDate() + 7);
+        updateDateAndRender();
     }
 });
+
+function updateDateAndRender() {
+    currentViewDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+    renderCalendar();
+    updatePreview();
+}
 
 window.addEventListener('message', event => {
     const message = event.data;
@@ -61,3 +139,8 @@ window.addEventListener('message', event => {
             break;
     }
 });
+
+// Initial render
+renderCalendar();
+updatePreview();
+document.getElementById('calendar-widget').focus();

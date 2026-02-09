@@ -17,12 +17,85 @@ body {
     max-width: 300px;
 }
 
-input[type="date"] {
+.calendar-widget {
+    border: 1px solid var(--vscode-widget-border, var(--vscode-input-border));
+    background-color: var(--vscode-editor-background);
+    border-radius: 4px;
+    overflow: hidden;
+    user-select: none;
+    outline: none;
+}
+
+.calendar-widget:focus {
+    border-color: var(--vscode-focusBorder);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 8px;
-    border: 1px solid var(--vscode-input-border);
-    background-color: var(--vscode-input-background);
-    color: var(--vscode-input-foreground);
-    border-radius: 2px;
+    background-color: var(--vscode-editor-background);
+    border-bottom: 1px solid var(--vscode-widget-border, var(--vscode-input-border));
+}
+
+.calendar-header span {
+    font-weight: bold;
+}
+
+.calendar-header button {
+    padding: 4px 8px;
+    background: transparent;
+    color: var(--vscode-button-foreground);
+    border: none;
+}
+
+.calendar-header button:hover {
+    background-color: var(--vscode-toolbar-hoverBackground);
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.8em;
+    padding: 4px 0;
+    opacity: 0.8;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 4px;
+}
+
+.calendar-day {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+    font-size: 0.9em;
+    margin: 2px;
+}
+
+.calendar-day:hover {
+    background-color: var(--vscode-list-hoverBackground);
+}
+
+.calendar-day.selected {
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+}
+
+.calendar-day.other-month {
+    opacity: 0.3;
+}
+
+.calendar-day.today {
+    border: 1px solid var(--vscode-button-background);
 }
 
 button {

@@ -9,7 +9,17 @@
 </head>
 <body>
   <div class="container">
-    <input type="date" id="calendar" />
+    <div id="calendar-widget" class="calendar-widget" tabindex="0">
+      <div class="calendar-header">
+        <button id="prevMonth">&lt;</button>
+        <span id="monthDisplay"></span>
+        <button id="nextMonth">&gt;</button>
+      </div>
+      <div class="calendar-weekdays">
+        <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+      </div>
+      <div id="calendar-grid" class="calendar-grid"></div>
+    </div>
     <div id="preview" class="preview"></div>
     <button id="insertBtn">Insert Date</button>
   </div>
