@@ -2,6 +2,7 @@
   "name": "calendar",
   "displayName": "Calendar",
   "description": "Interactive Calendar",
+  "license": "GPL-3.0-only",
   "version": "0.0.1",
   "icon": "icon.png",
   "engines": {
@@ -19,7 +20,7 @@
         "calendar.dateFormat": {
           "type": "string",
           "default": "default",
-          "description": "The format to use for the inserted date. Use 'default' for system locale format, or 'ISO' for YYYY-MM-DD."
+          "description": "The format to use for dates. Use 'default' to automatically detect the format from the document or use system locale, or 'ISO' for YYYY-MM-DD."
         },
         "calendar.enabledLanguages": {
           "type": "array",

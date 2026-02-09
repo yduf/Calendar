@@ -49,7 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
         const editCommandUri = vscode.Uri.parse(
           `command:calendar.editDate?${encodeURIComponent(JSON.stringify(args))}`
         );
-        const contents = new vscode.MarkdownString(`[Edit Date](${editCommandUri})`);
+        const contents = new vscode.MarkdownString(`[📅 Edit Date](${editCommandUri})`);
         contents.isTrusted = true;
         return new vscode.Hover(contents, dateMatch.range);
       }
@@ -88,6 +88,9 @@ async function showCalendarWebview(
     return;
   }
 
+  // Use original format if provided (editing), otherwise try to detect one from the document for consistency
+  const formatToUse = originalFormat || detectDateFormat(editor.document);
+
   const panel = vscode.window.createWebviewPanel(
     'calendar',
     'Select Date',
@@ -115,10 +118,10 @@ async function showCalendarWebview(
     switch (message.type) {
       case 'dateSelected':
         try {
-          if (range && originalFormat) {
-            replaceDateAtRange(editor, range, message.value, originalFormat);
+          if (range) {
+            replaceDateAtRange(editor, range, message.value, formatToUse);
           } else {
-            insertDateAtCursor(editor, message.value);
+            insertDateAtCursor(editor, message.value, formatToUse);
           }
         } catch (err) {
           vscode.window.showErrorMessage(`Failed to apply date: ${err}`);
@@ -134,7 +137,7 @@ async function showCalendarWebview(
       case 'requestPreview':
         panel.webview.postMessage({
           type: 'updatePreview',
-          value: getFormattedDate(message.value, originalFormat)
+          value: getFormattedDate(message.value, formatToUse)
         });
         return;
     }
@@ -145,6 +148,32 @@ interface DateMatch {
   range: vscode.Range;
   date: Date;
   format: string;
+}
+
+function detectDateFormat(document: vscode.TextDocument): string | undefined {
+  const ambiguity = vscode.workspace.getConfiguration('calendar').get<string>('ambiguityResolution', 'DMY');
+  const limit = Math.min(document.lineCount, 100);
+
+  const isoRegex = /\b(\d{4})-(\d{1,2})-(\d{1,2})\b/;
+  const commonRegex = /\b(\d{1,2})([/.-])(\d{1,2})\2(\d{2,4})\b/;
+
+  for (let i = 0; i < limit; i++) {
+    const line = document.lineAt(i).text;
+
+    const isoMatch = line.match(isoRegex);
+    if (isoMatch) {
+      return 'YYYY-MM-DD';
+    }
+
+    const commonMatch = line.match(commonRegex);
+    if (commonMatch) {
+      const sep = commonMatch[2];
+      let format = ambiguity === 'MDY' ? `MM${sep}DD${sep}` : `DD${sep}MM${sep}`;
+      format += commonMatch[4].length === 4 ? 'YYYY' : 'YY';
+      return format;
+    }
+  }
+  return undefined;
 }
 
 function findDateAtPosition(document: vscode.TextDocument, position: vscode.Position): DateMatch | undefined {
@@ -201,7 +230,11 @@ function findDateAtPosition(document: vscode.TextDocument, position: vscode.Posi
 
 function getFormattedDate(dateString: string, formatOverride?: string): string {
   const config = vscode.workspace.getConfiguration('calendar');
-  const format = formatOverride || config.get<string>('dateFormat', 'default');
+  const userFormat = config.get<string>('dateFormat', 'default');
+
+  // Prioritize user-defined format if it's not 'default'. 
+  // Otherwise, use the detected format from the document (formatOverride).
+  const format = (userFormat !== 'default') ? userFormat : (formatOverride || 'default');
 
   const date = new Date(dateString);
   let formattedDate: string;
@@ -229,14 +262,14 @@ function getFormattedDate(dateString: string, formatOverride?: string): string {
   return formattedDate;
 }
 
-function insertDateAtCursor(editor: vscode.TextEditor, dateString: string) {
-  const formattedDate = getFormattedDate(dateString);
+function insertDateAtCursor(editor: vscode.TextEditor, dateString: string, format?: string) {
+  const formattedDate = getFormattedDate(dateString, format);
   editor.edit(editBuilder => {
     editBuilder.insert(editor.selection.active, formattedDate);
   });
 }
 
-function replaceDateAtRange(editor: vscode.TextEditor, range: vscode.Range, dateString: string, format: string) {
+function replaceDateAtRange(editor: vscode.TextEditor, range: vscode.Range, dateString: string, format?: string) {
   const formattedDate = getFormattedDate(dateString, format);
   editor.edit(editBuilder => {
     editBuilder.replace(range, formattedDate);
