@@ -1,7 +1,8 @@
 {
-  "name": "calendar",
-  "displayName": "Calendar",
+  "name": "calendar17",
+  "displayName": "Calendar 17",
   "description": "Interactive Calendar",
+  "publisher": "UsefullCode",
   "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
