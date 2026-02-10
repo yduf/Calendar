@@ -19,6 +19,8 @@ see [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LI
 - insert date command providing a visual calendar
 - recognize date and allow Calendar edit while keeping original format
 
+![Demo of My Extension](images/demo.gif)
+
 ## Extension Settings
 
 This extension contributes the following settings:
@@ -31,8 +33,18 @@ This extension contributes the following settings:
 
 Depending on system input format, first date insert may lead to a different format when editing latter on.
 
+By default extension is only enabled on Plain Text and Markdown. You need to trigger explicitly a `calendar.insertDate` on other document type to enable it.
+
+### Plain Text
+
+VS Code often has `editor.quickSuggestions` disabled by default for plaintext files, which prevents snippets from appearing automatically as you type.
+
+The `//` prefix might need manual triggering  `Ctrl+Space` (or `Cmd+Space` on Mac)
+ rather than appearing automatically.
+
+
 ## Release Notes
 
-### 0.0.2
+### 0.0.4
 
 Initial release

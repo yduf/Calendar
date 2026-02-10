@@ -7,14 +7,17 @@
     "type": "git",
     "url": "https://github.com/yduf/Calendar.git"
   },
-  "version": "0.0.3",
+  "version": "0.0.4",
   "icon": "icon.png",
   "engines": {
     "vscode": "^1.108.0"
   },
   "categories": [ "Snippets", "Other"  ],
   "keywords": ["calendar", "date picker", "productivity", "forms", "input"],
-  "activationEvents": [],
+  "activationEvents": [  
+    "onLanguage:markdown",
+    "onLanguage:plaintext"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "configuration": {
@@ -58,6 +61,10 @@
         "command": "calendar.editDate",
         "title": "Edit Date"
       }
+    ],
+    "snippets": [
+      { "language": "markdown", "path": "./snippets/date.json" },
+      { "language": "plaintext", "path": "./snippets/date.json" }
     ]
   },
   "scripts": {
