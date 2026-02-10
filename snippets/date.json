@@ -1,0 +1,7 @@
+{
+  "Insert current date": {
+    "prefix": "//",
+    "body": ["${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}"],
+    "description": "Insert current date"
+  }
+}

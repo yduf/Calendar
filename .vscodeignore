@@ -1,11 +1,22 @@
-.vscode/**
-.vscode-test/**
+# Source & tooling
 src/**
+test/**
+.vscode/**
+.git/**
 .gitignore
-.yarnrc
+tsconfig.json
+webpack.config.js
+
+# Node / tooling
+node_modules/**
+npm-debug.log
+yarn.lock
+
+# Docs not needed at runtime
+CHANGELOG.md
+eslint.config.mjs
 vsc-extension-quickstart.md
-**/tsconfig.json
-**/eslint.config.mjs
+out/test/**
+
+# Maps (optional)
 **/*.map
-**/*.ts
-**/.vscode-test.*
