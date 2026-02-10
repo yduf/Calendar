@@ -1,5 +1,4 @@
-<a id="top">
-
+<a id="top"></a>
 <div style="display: flex; align-items: flex-start;">
   <img src="icon.png" alt="Logo" width="120" style="margin-right: 16px;">
   <div>
@@ -9,8 +8,6 @@
     </p>
   </div>
 </div>
-</a>
-
 
 Calendar is an open-source VS Code extension licensed under **GPL v3**.  
 see [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE) for details. 

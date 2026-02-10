@@ -7,14 +7,13 @@
     "type": "git",
     "url": "https://github.com/yduf/Calendar.git"
   },
-  "version": "0.0.2",
+  "version": "0.0.3",
   "icon": "icon.png",
   "engines": {
     "vscode": "^1.108.0"
   },
-  "categories": [
-    "Other"
-  ],
+  "categories": [ "Snippets", "Other"  ],
+  "keywords": ["calendar", "date picker", "productivity", "forms", "input"],
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {

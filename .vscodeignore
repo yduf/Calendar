@@ -16,6 +16,8 @@ yarn.lock
 CHANGELOG.md
 eslint.config.mjs
 vsc-extension-quickstart.md
+
+.vscode-test.mjs
 out/test/**
 
 # Maps (optional)
